@@ -24,7 +24,26 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe .\src\stl_batch_simplifier_qt.py
 ```
 
-减面使用 PyMeshLab 的二次误差边折叠算法；界面使用 PySide6，三维预览需要可用的 OpenGL。
+三维预览需要可用的 OpenGL。
+
+## MeshLab 算法与致谢
+
+本项目通过 PyMeshLab 调用 MeshLab 的 **Quadric Edge Collapse Decimation**（二次误差边折叠减面）滤镜。STL 批处理、文件导出、参数管理和双视窗对比由本项目的 Windows 界面提供。[MeshLab](https://github.com/cnr-isti-vclab/meshlab) · [滤镜参数文档](https://pymeshlab.readthedocs.io/en/latest/filter_list.html#meshing-decimation-quadric-edge-collapse)
+
+感谢 PyMeshLab 作者 Alessandro Muntoni、Paolo Cignoni 及 MeshLab 贡献者。该滤镜基于 Michael Garland 与 Paul S. Heckbert 在 SIGGRAPH 1997 发表的《Surface Simplification Using Quadric Error Metrics》。[PyMeshLab 引用](https://doi.org/10.5281/zenodo.4438750) · [MeshLab 论文](https://doi.org/10.2312/LocalChapterEvents/ItalChap/ItalianChapConf2008/129-136) · [算法论文](https://www.cs.cmu.edu/~garland/Papers/quadrics.pdf)
+
+## 第三方许可证
+
+| 组件 | 本项目中的用途 | 许可证 |
+| --- | --- | --- |
+| PyMeshLab / MeshLab | 网格处理及二次误差边折叠滤镜 | [GNU GPL v3](https://github.com/cnr-isti-vclab/PyMeshLab/blob/main/LICENSE) · [MeshLab 许可文件](https://github.com/cnr-isti-vclab/meshlab/blob/main/LICENSE.txt) |
+| PySide6 / Qt | Windows 界面和 OpenGL 控件 | [社区版 LGPL v3 / GPL v3，另有商业许可](https://doc.qt.io/qtforpython-6/commercial/index.html) |
+| NumPy | 网格数据和数值计算 | [BSD 3-Clause](https://numpy.org/doc/stable/license.html)，附带组件按各自许可证 |
+| PyInstaller | 将 Python 程序打包为 EXE | [GNU GPL v2 或更高版本，含打包例外](https://pyinstaller.org/en/stable/license.html)，部分文件采用 Apache 2.0 |
+
+上表记录了主要第三方组件的许可证。具体依赖版本见 [运行依赖](requirements.txt) 和 [构建依赖](requirements-build.txt)。本仓库的自有源码目前尚未指定开源许可证。
+
+公开分发 EXE 前，需要按实际打包的组件核对再分发条款，随包提供适用的许可证文本和版权声明，并按 GPL v3 提供适用范围内的对应源代码。PyInstaller 的打包例外不改变这些依赖的许可义务。[GPL v3 第 6 节](https://www.gnu.org/licenses/gpl-3.0.html#section6)
 
 ## 打包 EXE
 
