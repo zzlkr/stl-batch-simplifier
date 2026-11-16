@@ -1,0 +1,24 @@
+# Existing local project history and packaged builds
+/work/
+/outputs/
+/build/
+/dist/
+/.test-artifacts/
+
+# Python and editor files
+/.venv/
+/venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.vscode/
+.idea/
+
+# Local data and credentials
+*.stl
+*.STL
+*.exe
+*.log
+.env
+.env.*
+Thumbs.db

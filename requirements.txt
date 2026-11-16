@@ -1,0 +1,3 @@
+numpy==2.5.2
+pymeshlab==2025.7.post1
+PySide6==6.11.2
