@@ -8,6 +8,8 @@ Windows 桌面工具：批量简化 STL 三角网格，在同步的 OpenGL 视�
 
 ![工作台：测试球体减面前后对比](docs/workbench.png)
 
+Windows 10/11 64 位版本见 [v1.7.0 下载页](https://github.com/zzlkr/stl-batch-simplifier/releases/tag/v1.7.0)。
+
 ## 使用
 
 选择输入和输出文件夹，设置参数后点击「批量处理」。如果只想尝试某几个零件，在左侧列表中单选或多选，修改参数后点「预览选中」。中间两个视窗会同步旋转和缩放。效果合适时点「应用所选预览」，把当前预览写入输出目录。应用预览会覆盖对应的输出 STL。
@@ -32,7 +34,9 @@ py -3.12 -m venv .venv
 
 感谢 PyMeshLab 作者 Alessandro Muntoni、Paolo Cignoni 及 MeshLab 贡献者。该滤镜基于 Michael Garland 与 Paul S. Heckbert 在 SIGGRAPH 1997 发表的《Surface Simplification Using Quadric Error Metrics》。[PyMeshLab 引用](https://doi.org/10.5281/zenodo.4438750) · [MeshLab 论文](https://doi.org/10.2312/LocalChapterEvents/ItalChap/ItalianChapConf2008/129-136) · [算法论文](https://www.cs.cmu.edu/~garland/Papers/quadrics.pdf)
 
-## 第三方许可证
+## 许可证
+
+本项目自有源码采用 GNU General Public License v3.0 only（`GPL-3.0-only`）。[许可证全文](LICENSE)
 
 | 组件 | 本项目中的用途 | 许可证 |
 | --- | --- | --- |
@@ -41,9 +45,7 @@ py -3.12 -m venv .venv
 | NumPy | 网格数据和数值计算 | [BSD 3-Clause](https://numpy.org/doc/stable/license.html)，附带组件按各自许可证 |
 | PyInstaller | 将 Python 程序打包为 EXE | [GNU GPL v2 或更高版本，含打包例外](https://pyinstaller.org/en/stable/license.html)，部分文件采用 Apache 2.0 |
 
-上表记录了主要第三方组件的许可证。具体依赖版本见 [运行依赖](requirements.txt) 和 [构建依赖](requirements-build.txt)。本仓库的自有源码目前尚未指定开源许可证。
-
-公开分发 EXE 前，需要按实际打包的组件核对再分发条款，随包提供适用的许可证文本和版权声明，并按 GPL v3 提供适用范围内的对应源代码。PyInstaller 的打包例外不改变这些依赖的许可义务。[GPL v3 第 6 节](https://www.gnu.org/licenses/gpl-3.0.html#section6)
+上表记录了主要第三方组件的许可证。Release 同时提供应用源码、许可证文本及构建配置。原始依赖版本见 [运行依赖](requirements.txt) 和 [构建依赖](requirements-build.txt)，打包依赖的对应源码见 [第三方许可与源码](docs/THIRD_PARTY_NOTICES.md)。
 
 ## 打包 EXE
 
