@@ -8,11 +8,11 @@ Windows 桌面工具：批量简化 STL 三角网格，在同步的 OpenGL 视�
 
 ![工作台：测试球体减面前后对比](docs/workbench.png)
 
-Windows 10/11 64 位版本见 [v1.7.0 下载页](https://github.com/zzlkr/stl-batch-simplifier/releases/tag/v1.7.0)。
+Windows 10/11 64 位版本见 [v1.8.0 下载页](https://github.com/zzlkr/stl-batch-simplifier/releases/tag/v1.8.0)。
 
 ## 使用
 
-选择输入和输出文件夹，设置参数后点击「批量处理」。如果只想尝试某几个零件，在左侧列表中单选或多选，修改参数后点「预览选中」。中间两个视窗会同步旋转和缩放。效果合适时点「应用所选预览」，把当前预览写入输出目录。应用预览会覆盖对应的输出 STL。
+选择输入和输出文件夹，在底部「减面设置」调整参数后点击「批量处理」。如果只想尝试某几个零件，在左侧列表中单选或多选，修改参数后点「预览选中」。两个视窗会同步旋转和缩放。效果合适时点「应用所选预览」，把当前预览写入输出目录。应用预览会覆盖对应的输出 STL。
 
 详细步骤和参数见 [使用说明](docs/使用说明.txt)。
 
@@ -54,7 +54,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean .\STL_Batch_Simplifier.spec
 ```
 
-生成位置：`dist\STL_Batch_Simplifier_v1.7.exe`。打包后的 EXE 可在 Windows 上运行，无需另外安装 Python 或 MeshLab。
+生成位置：`dist\STL_Batch_Simplifier_v1.8.exe`。打包后的 EXE 可在 Windows 上运行，无需另外安装 Python 或 MeshLab。
 
 ## 验证
 

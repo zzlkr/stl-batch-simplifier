@@ -38,7 +38,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='STL_Batch_Simplifier_v1.7',
+    name='STL_Batch_Simplifier_v1.8',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

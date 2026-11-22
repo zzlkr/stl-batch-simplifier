@@ -41,7 +41,6 @@ from PySide6.QtWidgets import (
     QProgressBar,
     QPushButton,
     QRadioButton,
-    QScrollArea,
     QSizePolicy,
     QSplitter,
     QSpinBox,
@@ -55,7 +54,7 @@ from PySide6.QtWidgets import (
 
 
 APP_NAME = "STL 批量减面工具"
-APP_VERSION = "1.7.0"
+APP_VERSION = "1.8.0"
 
 
 @dataclass(frozen=True)
@@ -444,6 +443,7 @@ class MainWindow(QMainWindow):
         folder_grid = QGridLayout(folders)
         folder_grid.setContentsMargins(12, 6, 12, 6)
         folder_grid.setColumnStretch(1, 1)
+        folder_grid.setColumnStretch(4, 1)
         self.input_edit = QLineEdit()
         self.output_edit = QLineEdit()
         input_button = QPushButton("浏览…")
@@ -453,9 +453,9 @@ class MainWindow(QMainWindow):
         folder_grid.addWidget(QLabel("输入文件夹："), 0, 0)
         folder_grid.addWidget(self.input_edit, 0, 1)
         folder_grid.addWidget(input_button, 0, 2)
-        folder_grid.addWidget(QLabel("输出文件夹："), 1, 0)
-        folder_grid.addWidget(self.output_edit, 1, 1)
-        folder_grid.addWidget(output_button, 1, 2)
+        folder_grid.addWidget(QLabel("输出文件夹："), 0, 3)
+        folder_grid.addWidget(self.output_edit, 0, 4)
+        folder_grid.addWidget(output_button, 0, 5)
         self.recursive_check = QCheckBox("包含子文件夹并保留目录结构")
         self.overwrite_check = QCheckBox("覆盖输出目录中的同名文件")
         option_row = QHBoxLayout()
@@ -463,7 +463,7 @@ class MainWindow(QMainWindow):
         option_row.addSpacing(20)
         option_row.addWidget(self.overwrite_check)
         option_row.addStretch(1)
-        folder_grid.addLayout(option_row, 2, 0, 1, 3)
+        folder_grid.addLayout(option_row, 1, 0, 1, 6)
         self.file_count_label = QLabel("请选择包含 STL 文件的输入文件夹")
         self.file_count_label.setStyleSheet("color: #5d6673;")
         self.input_edit.editingFinished.connect(self.refresh_file_count)
@@ -477,17 +477,15 @@ class MainWindow(QMainWindow):
         self.cancel_button.setEnabled(False)
         self.selected_button = QPushButton("重做选中（0）")
         self.selected_button.setEnabled(False)
-        self.selected_button.setToolTip("使用右侧参数，从原始 STL 重新减面；覆盖选中零件的输出文件。")
+        self.selected_button.setToolTip("使用底部参数从原始 STL 重新减面，并覆盖选中零件的输出文件。")
         self.selected_button.clicked.connect(self.start_selected)
         self.load_part_options_button = QPushButton("载入零件参数")
         self.load_part_options_button.setEnabled(False)
         self.load_part_options_button.clicked.connect(self.load_part_options)
-        defaults_button = QPushButton("恢复默认")
         self.open_output_button = QPushButton("打开输出")
         self.open_output_button.setEnabled(False)
         self.start_button.clicked.connect(self.start_batch)
         self.cancel_button.clicked.connect(self.cancel_batch)
-        defaults_button.clicked.connect(self.restore_defaults)
         self.open_output_button.clicked.connect(self.open_output_folder)
 
         self.preview_selected_button = QPushButton("预览选中", objectName="previewAction")
@@ -578,7 +576,7 @@ class MainWindow(QMainWindow):
         self.before_preview = MeshPreviewWidget("原始模型", "#b9bec6")
         self.after_preview = MeshPreviewWidget("简化后", "#b9bec6")
         for preview in (self.before_preview, self.after_preview):
-            preview.setMinimumWidth(244)
+            preview.setMinimumSize(244, 140)
             comparison.addWidget(preview)
         self.before_preview.view_changed.connect(self.after_preview.set_view)
         self.after_preview.view_changed.connect(self.before_preview.set_view)
@@ -595,115 +593,11 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.log_edit, "处理日志")
         work_area.addWidget(self.tabs)
 
-        property_panel = QWidget(objectName="sidePanel")
-        property_panel.setMinimumWidth(215)
-        inspector = QVBoxLayout(property_panel)
-        inspector.setContentsMargins(0, 0, 0, 0)
-        inspector.setSpacing(0)
-        inspector_header, inspector_title = strip("dockTitle")
-        inspector_title.addWidget(QLabel("减面属性"))
-        inspector_title.addStretch()
-        inspector.addWidget(inspector_header)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.settings_group = QWidget(objectName="propertyBody")
-        scroll.setWidget(self.settings_group)
-        inspector.addWidget(scroll, 1)
-        sections = QVBoxLayout(self.settings_group)
-        sections.setContentsMargins(0, 0, 0, 0)
-        sections.setSpacing(0)
+        work_area.setStretchFactor(1, 1)
+        work_area.setSizes([260, 1116])
 
-        def section(name, expanded):
-            toggle = QToolButton(objectName="propertySection")
-            toggle.setText(name)
-            toggle.setCheckable(True)
-            toggle.setChecked(expanded)
-            toggle.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
-            toggle.setArrowType(Qt.ArrowType.DownArrow if expanded else Qt.ArrowType.RightArrow)
-            toggle.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            body = QWidget()
-            grid = QGridLayout(body)
-            grid.setContentsMargins(10, 6, 10, 8)
-            grid.setColumnStretch(1, 1)
-            toggle.toggled.connect(body.setVisible)
-            toggle.toggled.connect(lambda shown: toggle.setArrowType(
-                Qt.ArrowType.DownArrow if shown else Qt.ArrowType.RightArrow))
-            body.setVisible(expanded)
-            sections.addWidget(toggle)
-            sections.addWidget(body)
-            return grid
-
-        def property_row(grid, row, text, editor):
-            label = QLabel(text)
-            label.setBuddy(editor)
-            grid.addWidget(label, row, 0)
-            grid.addWidget(editor, row, 1)
-
-        targets = section("减面目标", True)
-        self.faces_radio = QRadioButton("目标面数")
-        self.percent_radio = QRadioButton("保留比例")
-        self.target_faces_spin = QSpinBox()
-        self.target_faces_spin.setRange(1, 100_000_000)
-        self.target_faces_spin.setGroupSeparatorShown(True)
-        self.retain_spin = QDoubleSpinBox()
-        self.retain_spin.setRange(0.01, 100.0)
-        self.retain_spin.setDecimals(2)
-        self.retain_spin.setSuffix(" %")
-        self.retain_spin.setToolTip("10% 表示保留约十分之一的三角面")
-        targets.addWidget(self.percent_radio, 0, 0)
-        targets.addWidget(self.retain_spin, 0, 1)
-        targets.addWidget(self.faces_radio, 1, 0)
-        targets.addWidget(self.target_faces_spin, 1, 1)
-        self.faces_radio.toggled.connect(self.update_target_state)
-        self.quality_spin = QDoubleSpinBox()
-        self.quality_spin.setRange(0, 1)
-        self.quality_spin.setDecimals(3)
-        self.quality_spin.setSingleStep(0.05)
-        self.quality_spin.setToolTip("0～1；值越高越抑制狭长、畸形三角面")
-        property_row(targets, 2, "质量阈值", self.quality_spin)
-
-        constraints = section("几何约束", True)
-        self.preserve_boundary_check = QCheckBox("保留网格边界")
-        self.preserve_normal_check = QCheckBox("保持法线")
-        self.preserve_topology_check = QCheckBox("保持拓扑")
-        for row, check in enumerate((self.preserve_boundary_check, self.preserve_normal_check,
-                                     self.preserve_topology_check)):
-            constraints.addWidget(check, row, 0, 1, 2)
-
-        advanced = section("高级参数", False)
-        self.boundary_weight_spin = QDoubleSpinBox()
-        self.boundary_weight_spin.setRange(0, 1_000_000)
-        self.boundary_weight_spin.setDecimals(4)
-        property_row(advanced, 0, "边界权重", self.boundary_weight_spin)
-        self.planar_weight_spin = QDoubleSpinBox()
-        self.planar_weight_spin.setRange(0, 1_000_000)
-        self.planar_weight_spin.setDecimals(6)
-        self.planar_weight_spin.setSingleStep(0.001)
-        property_row(advanced, 1, "平面权重", self.planar_weight_spin)
-        self.optimal_check = QCheckBox("最优顶点位置")
-        self.planar_check = QCheckBox("平面区域简化")
-        self.weighted_check = QCheckBox("按三角面质量加权")
-        self.clean_check = QCheckBox("简化后自动清理")
-        for row, check in enumerate((self.optimal_check, self.planar_check, self.weighted_check,
-                                     self.clean_check), start=2):
-            advanced.addWidget(check, row, 0, 1, 2)
-
-        summary = section("当前零件", True)
-        self.part_stat_labels = [QLabel("—") for _ in range(3)]
-        for row, title in enumerate(("原始面数", "结果面数", "减少比例")):
-            self.part_stat_labels[row].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            property_row(summary, row, title, self.part_stat_labels[row])
-        sections.addStretch()
-        inspector_footer, inspector_commands = strip("propertyFooter")
-        inspector_commands.addWidget(self.load_part_options_button, 1)
-        inspector_commands.addWidget(defaults_button)
-        inspector.addWidget(inspector_footer)
-        work_area.addWidget(property_panel)
-        for index, stretch in enumerate((0, 1, 0)):
-            work_area.setStretchFactor(index, stretch)
-        work_area.setSizes([236, 885, 249])
+        self.settings_group = self._build_settings_panel()
+        page.addWidget(self.settings_group)
 
         status, status_items = strip("statusBar")
         self.selection_label = QLabel("选中 0 件")
@@ -725,12 +619,13 @@ class MainWindow(QMainWindow):
 
         central.setStyleSheet("""
             QWidget#workbench { background: #f2f5f8; color: #263448; }
-            QWidget#commandBar, QWidget#statusBar, QWidget#dockTitle, QWidget#propertyFooter {
+            QWidget#commandBar, QWidget#statusBar, QWidget#dockTitle, QWidget#settingsTitle {
                 background: #e8edf3; border-bottom: 1px solid #c9d3df;
             }
-            QWidget#folderPanel, QWidget#propertyBody, QWidget#sidePanel { background: #f8fafc; }
-            QWidget#folderPanel, QWidget#statusBar { border-top: 1px solid #c9d3df; }
-            QWidget#dockTitle QLabel { font-weight: 600; }
+            QWidget#folderPanel, QWidget#settingsPanel, QWidget#sidePanel { background: #f8fafc; }
+            QWidget#folderPanel, QWidget#statusBar, QWidget#settingsPanel { border-top: 1px solid #c9d3df; }
+            QWidget#dockTitle QLabel, QLabel#settingsHeading { font-weight: 600; }
+            QLabel#parameterHint, QLabel#partMetricLabel { color: #526378; }
             QLabel#treeFooter { color: #526378; padding: 6px 9px; border-top: 1px solid #c9d3df; }
             QLabel#pendingText { color: #8a510b; }
             QFrame#divider { color: #b9c7d6; }
@@ -742,11 +637,6 @@ class MainWindow(QMainWindow):
             QPushButton#previewAction:hover:enabled { background: #1b4d98; }
             QPushButton#previewAction:focus:enabled { border: 2px solid #133a74; padding: 3px 7px; }
             QPushButton#previewAction:disabled { color: #586a80; background: #dce5f1; border-color: #b9c7d6; }
-            QToolButton#propertySection {
-                background: #e8edf3; border: 0; border-bottom: 1px solid #c9d3df;
-                padding: 6px 8px; text-align: left; font-weight: 600;
-            }
-            QToolButton#propertySection:focus { border: 1px solid #225bb0; padding: 5px 7px; }
             QTreeWidget, QPlainTextEdit { border: 0; }
             QTreeWidget::item { padding: 4px 2px; }
             QTreeWidget::item:selected, QTreeWidget::item:selected:!active {
@@ -755,6 +645,104 @@ class MainWindow(QMainWindow):
             QSplitter#workArea::handle { background: #c9d3df; width: 4px; }
             QSplitter#viewDivider::handle { background: #708399; width: 3px; }
         """)
+
+    def _build_settings_panel(self) -> QWidget:
+        panel = QWidget(objectName="settingsPanel")
+        panel.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        header = QWidget(objectName="settingsTitle")
+        header_row = QHBoxLayout(header)
+        header_row.setContentsMargins(10, 4, 10, 4)
+        header_row.addWidget(QLabel("减面设置", objectName="settingsHeading"))
+        header_row.addStretch()
+        self.part_stat_labels = []
+        for title in ("原始面数", "结果面数", "减少比例"):
+            header_row.addWidget(QLabel(title, objectName="partMetricLabel"))
+            value = QLabel("—")
+            self.part_stat_labels.append(value)
+            header_row.addWidget(value)
+            header_row.addSpacing(7)
+        header_row.addWidget(self.load_part_options_button)
+        defaults_button = QPushButton("恢复默认参数")
+        defaults_button.clicked.connect(self.restore_defaults)
+        header_row.addWidget(defaults_button)
+        layout.addWidget(header)
+
+        grid = QGridLayout()
+        grid.setContentsMargins(10, 7, 10, 9)
+        grid.setHorizontalSpacing(18)
+        grid.setVerticalSpacing(4)
+        grid.setColumnStretch(0, 1)
+        grid.setColumnStretch(1, 1)
+
+        def spin_box(label: str, decimals: int, maximum: float, step: float) -> QDoubleSpinBox:
+            spin = QDoubleSpinBox()
+            spin.setAccessibleName(label)
+            spin.setRange(0, maximum)
+            spin.setDecimals(decimals)
+            spin.setSingleStep(step)
+            spin.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+            return spin
+
+        def row(grid_row: int, column: int, *widgets: QWidget, span: int = 1) -> None:
+            line = QHBoxLayout()
+            line.setSpacing(9)
+            for widget in widgets:
+                line.addWidget(widget)
+            line.addStretch()
+            grid.addLayout(line, grid_row, column, 1, span)
+
+        self.faces_radio = QRadioButton("指定目标面数")
+        self.percent_radio = QRadioButton("指定保留比例")
+        self.target_faces_spin = QSpinBox()
+        self.target_faces_spin.setAccessibleName("目标面数")
+        self.target_faces_spin.setRange(1, 100_000_000)
+        self.target_faces_spin.setGroupSeparatorShown(True)
+        self.target_faces_spin.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.retain_spin = spin_box("保留比例", 2, 100.0, 1.0)
+        self.retain_spin.setMinimum(0.01)
+        self.retain_spin.setSuffix(" %")
+        ratio_hint = QLabel("10 表示保留 10%", objectName="parameterHint")
+        self.retain_spin.setToolTip(ratio_hint.text())
+        row(0, 0, QLabel("目标方式"), self.faces_radio, self.target_faces_spin,
+            self.percent_radio, self.retain_spin, ratio_hint, span=2)
+        self.faces_radio.toggled.connect(self.update_target_state)
+
+        self.quality_spin = spin_box("质量阈值", 3, 1, 0.05)
+        quality_label = QLabel("质量阈值")
+        quality_label.setBuddy(self.quality_spin)
+        quality_hint = QLabel("0～1，值越高越抑制狭长、畸形三角面", objectName="parameterHint")
+        self.quality_spin.setToolTip(quality_hint.text())
+        row(1, 0, quality_label, self.quality_spin, quality_hint, span=2)
+
+        self.preserve_boundary_check = QCheckBox("保留网格边界")
+        self.boundary_weight_spin = spin_box("边界权重", 4, 1_000_000, 1.0)
+        boundary_label = QLabel("边界权重")
+        boundary_label.setBuddy(self.boundary_weight_spin)
+        row(2, 0, self.preserve_boundary_check, boundary_label, self.boundary_weight_spin)
+        self.preserve_normal_check = QCheckBox("保持法线")
+        self.preserve_topology_check = QCheckBox("保持拓扑")
+        row(2, 1, self.preserve_normal_check, self.preserve_topology_check)
+
+        self.optimal_check = QCheckBox("简化顶点采用最优位置")
+        row(3, 0, self.optimal_check)
+        self.planar_check = QCheckBox("平面区域简化")
+        self.planar_weight_spin = spin_box("平面权重", 6, 1_000_000, 0.001)
+        planar_label = QLabel("平面权重")
+        planar_label.setBuddy(self.planar_weight_spin)
+        row(3, 1, self.planar_check, planar_label, self.planar_weight_spin)
+
+        self.weighted_check = QCheckBox("按三角面质量加权简化")
+        row(4, 0, self.weighted_check)
+        self.clean_check = QCheckBox("简化后自动清理")
+        selected_check = QCheckBox("仅简化选中面（STL 不保存选择状态）", objectName="selectedFaces")
+        selected_check.setEnabled(False)
+        row(4, 1, self.clean_check, selected_check)
+        layout.addLayout(grid)
+        return panel
 
     @Slot()
     def choose_input(self) -> None:

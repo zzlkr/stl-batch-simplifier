@@ -1,10 +1,10 @@
-# STL 批量减面工具 v1.7.0 的依赖源码与许可
+# STL 批量减面工具 v1.8.0 的依赖源码与许可
 
-此清单对应 Windows x64 文件 `STL_Batch_Simplifier_v1.7.exe`。
+此清单对应 Windows x64 文件 `STL_Batch_Simplifier_v1.8.exe`。
 
-- 文件大小为 116374522 字节。
-- SHA-256 为 `e737c23b8d44f980aac973fa38c840ab7992b91af0a03b7758f860b09dcc3a0c`。
-- 应用代码对应标签 `v1.7.0`。Release 提供包含应用源代码、构建配置及许可证的 `STL_Batch_Simplifier_v1.7.0-source.zip`。构建命令见包内 README，依赖版本见 requirements.txt 和 requirements-build.txt。
+- 文件大小为 116375655 字节。
+- SHA-256 为 `44a5c26bb1475b2f9f4d37e2f592e0f25b2fa211b12fc2f4b6425aa506b1fbdd`。
+- 应用代码对应标签 `v1.8.0`。Release 提供包含应用源代码、构建配置及许可证的 `STL_Batch_Simplifier_v1.8.0-source.zip`。构建命令见包内 README，依赖版本见 requirements.txt 和 requirements-build.txt。
 
 | 组件 | 对应版本 | 上游源码或许可证 |
 | --- | --- | --- |
